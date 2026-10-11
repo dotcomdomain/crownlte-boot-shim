@@ -59,11 +59,6 @@ _copy:
 	stp	x2, x3, [x5], #16
 	subs	x6, x6, #16
 	b.ne	_copy
-	/* Make the copied instruction stream visible before branching. */
-	dsb	sy
-	ic	iallu
-	dsb	sy
-	isb
 
 _entry:
 	ldr	x5, _rel_entry_base
