@@ -435,7 +435,7 @@ arch/$(ARCH)/linker.lds: arch/$(ARCH)/linker.lds.S $(linker-script-deps) FORCE
 # CMDs for binary formats
 #
 quiet_cmd_uniloader_link = LD      $@.o
-      cmd_uniloader_link = $(LD) $(uniloader-main-y) \
+      cmd_uniloader_link = $(LD) --orphan-handling=error $(uniloader-main-y) \
                                  --whole-archive $(uniloader-libs) --no-whole-archive \
                                  --start-group $(LIBGCC) --end-group \
                                  -o $@.o \

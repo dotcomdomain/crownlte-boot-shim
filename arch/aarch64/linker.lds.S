@@ -66,6 +66,19 @@ SECTIONS
 		*(.data.*)
 	}
 
+	/* Keep every file-backed relocation input before the explicit raw end.
+	 * Final links reject unaccounted orphan sections. */
+	.got ALIGN(8) : {
+		*(.got)
+		*(.got.*)
+	}
+
+	.reloc_pad : {
+		BYTE(0)
+		. = ALIGN(16);
+		_reloc_file_end = .;
+	}
+
 	.bss ALIGN(8) : {
 		__bss_start = .;
 		*(.bss)
@@ -91,6 +104,10 @@ SECTIONS
 #endif
 #ifdef CONFIG_POSITION_INDEPENDENT
 	_reloc_size = _reloc_end - _reloc_start;
+	_reloc_file_size = _reloc_file_end - _reloc_start;
+	ASSERT((_reloc_start & 15) == 0, "relocation destination must be 16-byte aligned")
+	ASSERT((_reloc_file_size & 15) == 0 && _reloc_file_size > 0,
+	       "file-backed relocation size must be positive and 16-byte aligned")
 #endif
 #ifdef CONFIG_LINUX_KRNL_HEADER_IMG
 	_kernel_size = _stack_end - _start;

@@ -8,7 +8,8 @@
 #include "linux-kernel-image-header.h"
 #endif
 
-.extern _reloc_size
+.extern _reloc_start
+.extern _reloc_file_size
 .extern _start
 
 ENTRY_ALIAS(_head)
@@ -19,30 +20,56 @@ ENTRY_ALIAS(_head)
 	b	 _reloc_entry
 #endif
 
-ENTRY_ALIAS(_rel_stack_base)
+ENTRY_ALIAS(_rel_copy_base)
+	.quad _reloc_start
+
+ENTRY_ALIAS(_rel_entry_base)
 	.quad _start
 
-ENTRY_ALIAS(_rel_stack_size)
-	.quad _reloc_size
+ENTRY_ALIAS(_rel_copy_size)
+	.quad _reloc_file_size
 
 ENTRY_ALIAS( _reloc_entry)
-	adr	x4, _start
-	ldr	x5, _rel_stack_base
+	/* Copy the complete raw file, including this header, but never BSS or
+	 * stack. A partial overlap could overwrite this running copy loop. */
+	adr	x4, _head
+	ldr	x5, _rel_copy_base
+	ldr	x6, _rel_copy_size
+	cbz	x6, _dead
+	tst	x6, #15
+	b.ne	_dead
+	tst	x4, #15
+	b.ne	_dead
+	tst	x5, #15
+	b.ne	_dead
+	adds	x7, x4, x6
+	b.cs	_dead
+	adds	x8, x5, x6
+	b.cs	_dead
 	cmp	x4, x5
-	beq	_entry
-	ldr	x6,  _rel_stack_size
+	b.eq	_entry
+	/* Half-open intervals are disjoint if src >= dst_end or dst >= src_end. */
+	cmp	x4, x8
+	b.hs	_copy
+	cmp	x5, x7
+	b.lo	_dead
 
 _copy:
 	ldp	x2, x3, [x4], #16
 	stp	x2, x3, [x5], #16
 	subs	x6, x6, #16
 	b.ne	_copy
-	ldr	x5, _rel_stack_base
+	/* Make the copied instruction stream visible before branching. */
+	dsb	sy
+	ic	iallu
+	dsb	sy
+	isb
 
 _entry:
+	ldr	x5, _rel_entry_base
 	br	x5
 
-_dead: /* we should never get here */
+_dead: /* No stores or kernel handoff after an invalid relocation interval. */
 	b	_dead
 
 ENTRY_ALIAS(_relocated_uni)
