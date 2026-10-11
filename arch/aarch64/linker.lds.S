@@ -31,6 +31,8 @@ SECTIONS
 #endif
 		*(.text)
 		*(.text.*)
+		*(.iplt)
+		*(.iplt.*)
 	}
 
 	.kernel ALIGN(4096) : {
@@ -71,7 +73,16 @@ SECTIONS
 	.got ALIGN(8) : {
 		*(.got)
 		*(.got.*)
+		*(.igot.plt)
+		*(.igot.plt.*)
 	}
+
+	/* Runtime dynamic relocations have no resolver in this raw shim. */
+	.rela.reject : {
+		*(.rela)
+		*(.rela.*)
+	}
+	ASSERT(SIZEOF(.rela.reject) == 0, "runtime relocations are unsupported")
 
 	.reloc_pad : {
 		BYTE(0)
@@ -117,6 +128,7 @@ SECTIONS
 	/DISCARD/ : {
 		*(.eh_frame)
 		*(.eh_frame.*)
+		*(.note.GNU-stack)
 		*(.note.gnu.property)
 		*(.note.gnu.build-id)
 		*(.comment)
