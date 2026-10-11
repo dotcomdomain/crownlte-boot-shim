@@ -1,0 +1,11 @@
+Source reference: https://github.com/SheroAbi/galaxy-s9plus-mainline-linux
+Pinned commit: bcee6014fc2e44a4c4f1c34bca0a880d4b543ec3
+ACK diagnostic: android16-6.12-2026-09_r4 Linux 6.12.92
+Kernel target 0x92000000 avoids captured SBoot log span 0x91202000..0x9179c000.
+Initramfs target 0x84000000 and loader text 0x87000000 are in captured active RAM.
+Kernel entry and initramfs must be rechecked for overlaps using actual sizes.
+Named crownlte board preserves Exynos9810 cache/exception handoff, with a
+distinct config. This is not evidence that the S9+ port runs on the Note9.
+Framebuffer 0xcc000000/native 1440x2960 is reserved in kernel DT but scanout is
+unverified; physical boot/reboot/recovery behavior remains untested.
+No boot image is packed or flashed by this script.
