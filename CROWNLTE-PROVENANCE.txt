@@ -9,3 +9,9 @@ distinct config. This is not evidence that the S9+ port runs on the Note9.
 Framebuffer 0xcc000000/native 1440x2960 is reserved in kernel DT but scanout is
 unverified; physical boot/reboot/recovery behavior remains untested.
 No boot image is packed or flashed by this script.
+
+Default crownlte_defconfig disables SIMPLE_FB and framebuffer console. The
+default board performs no DECON/framebuffer/register writes. Only RAM copies,
+FDT initramfs fixup, cache clean/exception handoff and kernel entry remain.
+Framebuffer console exists as an explicit disabled option; no image using it
+may be packaged before the initial CPU mapping/scanout is established.

@@ -434,3 +434,11 @@ menu "Device Specific Addresses"
 		default 0x51100000 if VOLLA_ALGIZ
 		default 0x48000000 if XIAOMI_BEGONIA
 endmenu
+
+config CROWNLTE_FRAMEBUFFER_CONSOLE
+	bool "Use captured Note9 bootloader framebuffer (requires mapping validation)"
+	depends on SAMSUNG_CROWNLTE && SIMPLE_FB
+	default n
+	help
+	  Enable only after checking CPU framebuffer mapping and retained scanout.
+	  SBoot static DMA evidence alone does not establish CPU mapping at entry.

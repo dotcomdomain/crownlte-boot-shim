@@ -20,3 +20,7 @@ CONFIG_FRAMEBUFFER_HEIGHT=2960
 CONFIG_FRAMEBUFFER_STRIDE=4
 
 # Native Note9 dimensions; bootloader scanout stride remains unverified.
+
+# Keep display writes out of the default diagnostic handoff.
+CONFIG_SIMPLE_FB=n
+CONFIG_CROWNLTE_FRAMEBUFFER_CONSOLE=n

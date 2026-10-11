@@ -8,6 +8,7 @@
 #include <drivers/framework.h>
 #include <lib/simplefb.h>
 
+#ifdef CONFIG_CROWNLTE_FRAMEBUFFER_CONSOLE
 #define DECON_F_BASE		0x16030000
 #define HW_SW_TRIG_CONTROL	0x70
 
@@ -41,3 +42,13 @@ struct board_data board_ops = {
 	.num_devices = ARRAY_SIZE(crownlte_devices),
 	.quirks = 0
 };
+
+#else
+/* No register or framebuffer writes while the initial CPU mapping is unknown. */
+struct board_data board_ops = {
+	.name = "samsung-crownlte-display-free",
+	.devices = NULL,
+	.num_devices = 0,
+	.quirks = 0,
+};
+#endif
