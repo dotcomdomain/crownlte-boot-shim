@@ -7,12 +7,16 @@
 #include <lib/debug.h>
 #include <main/boot.h>
 #include <main/boot-fdt.h>
+#include <main/main.h>
 #include <string.h>
 
 void boot_kernel(void* dt, void* kernel, void* ramdisk)
 {
 #ifdef CONFIG_LIBFDT
-	patch_dtb(&dt);
+	if (patch_dtb(&dt)) {
+		printk(KERN_EMERG, "Refusing kernel handoff without patched initramfs FDT\n");
+		HANG();
+	}
 #endif
 
 	printk(KERN_INFO, "Booting kernel...\n");
